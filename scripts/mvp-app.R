@@ -55,31 +55,31 @@ server <- function(input, output, session) {
   # ============================ #
   # 2) Put selection on a map ####
   # ============================ #
-  observeEvent(input$include, {
-    # 2a) Filter to selection ####
+  observeEvent(input$include, ignoreNULL = FALSE, {
+    # 2a) Clear shapes ####
+    proxy <- leafletProxy("map",session) %>%
+      clearGroup(group = "accidents")
+    
+    # 2b) Filter to selection ####
     selection <- NULL
     for (category in input$include) {
       selection <- unique(c(selection, which(accidents[category] == 1, useNames = TRUE)))
     }
     accidents_sub <- accidents[selection, ]
     
-    # 2b) Clear shapes ####
-    proxy <- leafletProxy("map",session) %>%
-      clearShapes() %>%
-      clearMarkers() %>%
-      clearControls()
-    
     # 2c) Update map ####
-    leafletProxy("map", session = session, data = accidents_sub) %>%
-      addMarkers(lng = ~XGCSWGS84, lat = ~YGCSWGS84, popup = ~paste("Bike: ",IstRad,"</br>",
-                                                                    "Car: ",IstPKW,"</br>",
-                                                                    "Pedestrian: ",IstFuss,"</br>",
-                                                                    "Krad: ",IstKrad,"</br>",
-                                                                    "Gkfz: ",IstGkfz,"</br>",
-                                                                    "Other: ",IstSonstige,"</br>"),
-                 group = "accidents",
-                 popupOptions = popupOptions(autoClose = FALSE, closeOnClick = FALSE),
-                 clusterOptions = markerClusterOptions())
+    if (!is.null(selection)) {
+      leafletProxy("map", session = session, data = accidents_sub) %>%
+        addMarkers(lng = ~XGCSWGS84, lat = ~YGCSWGS84, popup = ~paste("Bike: ",IstRad,"</br>",
+                                                                      "Car: ",IstPKW,"</br>",
+                                                                      "Pedestrian: ",IstFuss,"</br>",
+                                                                      "Krad: ",IstKrad,"</br>",
+                                                                      "Gkfz: ",IstGkfz,"</br>",
+                                                                      "Other: ",IstSonstige,"</br>"),
+                   group = "accidents",
+                   popupOptions = popupOptions(autoClose = FALSE, closeOnClick = FALSE),
+                   clusterOptions = markerClusterOptions())
+    }
   })
 }
 
