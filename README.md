@@ -1,7 +1,6 @@
 # Gefahrradtour
-Project for the HERE Map Data Hackathon 2020
 
-> Guys, feel free to change the name - I just had to put something to get started...
+Project for the HERE Map Data Hackathon 2020
 
 ### Introduction
 
@@ -20,5 +19,8 @@ After you run this in Rstudio, a tiny icon should show up next to the "Run App" 
 
 The demo app can be found here: [https://emelieh21.shinyapps.io/danger-ranger-demo/](https://emelieh21.shinyapps.io/danger-ranger-demo/).
 
-> To do: look into issue with the markers not clearing correctly online...
+<p align="right">
+	<img src="assets/logo.jpeg" alt="drawing" width="120"/>
+</p>
+
 
