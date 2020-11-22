@@ -19,9 +19,6 @@ pal <- colorNumeric(
   palette = "YlOrRd",
   domain = accidents$UKATEGORIE)
 
-# 4) Initialize reactiveValues ####
-values <- reactiveValues(result_a = result)
-
 # ================= #
 # USER INTERFACE ####
 # ================= #
@@ -91,8 +88,7 @@ server <- function(input, output, session) {
                        popupOptions = popupOptions(autoClose = FALSE, closeOnClick = FALSE),
                        radius = 1.5, color = ~pal(4-UKATEGORIE), weight = 0, fillOpacity = 1,
                        fillColor = ~pal(4-UKATEGORIE)) %>%
-      hideGroup("accidents") %>% 
-      # Initialize with default address
+      hideGroup("accidents") %>% # This should go somewhere else soon
       addCircleMarkers(group = "routePoints", lng = result$items$position$lng, lat = result$items$position$lat,
                        popup = "You are here", fillColor = "#ff675b", color = "#4d4d4d",
                        weight = 3, fillOpacity = 1, opacity = 1)
@@ -104,37 +100,26 @@ server <- function(input, output, session) {
   observeEvent(input$go, {
     # 2a) Get coordinates from point A address ####
     url <- paste0("https://geocode.search.hereapi.com/v1/geocode?q=",URLencode(input$point_a),"&apiKey=",token)
-    values$result_a <- fromJSON(url)
+    result_a <- fromJSON(url)
     
     # 2b) Get coordinates from point A address ####
     url <- paste0("https://geocode.search.hereapi.com/v1/geocode?q=",URLencode(input$point_b),"&apiKey=",token)
-    values$result_b <- fromJSON(url)
-  })
-  
-  # 2c) React to the change in location A/B ####
-  observeEvent({values$result_a
-                values$result_b}, {
-    # 2d) Clear shapes ####
+    result_b <- fromJSON(url)
+    
+    # 2c) Clear shapes ####
     proxy <- leafletProxy("map",session) %>%
       clearGroup(group = "routePoints")
     
-    # 2e) Put the new position on the map ####
-    result_a <- values$result_a
-    result_b <- values$result_b
-    
-    if (!is.null(result_a)) {
-      leafletProxy("map", session = session) %>%
-        addCircleMarkers(group = "routePoints", lng = result_a$items$position$lng, lat = result_a$items$position$lat,
-                         popup = "You are here", fillColor = "#ff675b", color = "#4d4d4d",
-                         weight = 3, fillOpacity = 1, opacity = 1)
-    }
-    
-    if (!is.null(result_b)) {
-      leafletProxy("map", session = session) %>% 
-        addCircleMarkers(group = "routePoints", lng = result_b$items$position$lng, lat = result_b$items$position$lat,
-                         popup = "You are thinking about going here", fillColor = "#fdfd00", color = "#4d4d4d",
-                         weight = 3, fillOpacity = 1, opacity = 1)
-    }
+    # 2d) Put the new position on the map ####
+    leafletProxy("map", session = session) %>%
+      # NOTE-TO-SELF: This makes no sense if people select very far points... You need to check if people use addresses in Berlin ####
+      setView(result_a$items$position$lng, result_b$items$position$lat, zoom = 12) %>% 
+      addCircleMarkers(group = "routePoints", lng = result_a$items$position$lng, lat = result_a$items$position$lat,
+                       popup = "You are here", fillColor = "#ff675b", color = "#4d4d4d",
+                       weight = 3, fillOpacity = 1, opacity = 1) %>%
+      addCircleMarkers(group = "routePoints", lng = result_b$items$position$lng, lat = result_b$items$position$lat,
+                       popup = "You are thinking about going here", fillColor = "#fdfd00", color = "#4d4d4d",
+                       weight = 3, fillOpacity = 1, opacity = 1)
   })
   
   # =============================== #
@@ -155,32 +140,9 @@ server <- function(input, output, session) {
         lat = ~newPoint$lat,
         fillColor = "#fdfd00",
         fillOpacity = 1,
-        color = "#1c1c1c",
-        weight = 3,
         label = "Click me!",
-        popup = HTML("<button onclick='Shiny.onInputChange(\"button_click\",  Math.random())' id='add' type='button' class='btn btn-default action-button' style = 'background-color: #ff675b; font-size: 14px; font-weight:700; color: white;'>Go here</button>"))
-  })
-  
-  # ================================ #
-  # 4) Add destination from click ####
-  # ================================ #
-  observeEvent(input$button_click, {
-    message("Adding destination")
-    destination <- input$map_marker_click
-    
-    # 4a) Update the destination address that is displayed ####
-    url = paste0("https://revgeocode.search.hereapi.com/v1/revgeocode?at=",
-                 destination$lat,"%2C",destination$lng,
-                 "&lang=en-US&apiKey=",token)
-    result <- fromJSON(url)
-    updateTextInput(session, "point_b", "To", value = result$items$address$label)
-    
-    # 4b) Clear shapes ####
-    proxy <- leafletProxy("map",session) %>%
-      clearGroup(group = "newPoint")
-    
-    # 4c) Overwrite the values$result_b ####
-    values$result_b <- result
+        popup = HTML("<button onclick='Shiny.onInputChange(\"button_click\",  Math.random())' id='add' type='button' class='btn btn-default action-button' style = 'background-color: #ff675b; font-size: 14px; font-weight:700; color: white;'>Go here</button>"),
+        weight = 0)
   })
 }
 
