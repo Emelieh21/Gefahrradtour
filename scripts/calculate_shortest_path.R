@@ -17,11 +17,12 @@ source("scripts/routing.R")
 
 # get road data as graph  -------------------------------------------------------------------
 road_data <- get_osm_road_data("Friedrichshain, Berlin") 
+#road_data <- get_osm_road_data("Konstanz, Germany") 
 
 
 # create final graph of road dataset, used for shortest path search  ------------------------
 
-# set factor for accidents (can be slider input ranging from 1-100 --> divide by 100)
+# set factor for accidents (can be slider input ranging from 0-1)
 # or can be meters that are added to edge length for each accident
 influence_factor_accidents <- 0.9
 add_meters <- 3000
@@ -56,6 +57,11 @@ to_nodexy <- c( 13.391495 ,52.512276)
 from_nodexy <- c(13.432853, 52.517991)
 to_nodexy <- c(13.466831, 52.514707)
 
+from_nodexy <- c(9.157345,47.686012)
+#from_nodexy <- c(9.164507,47.688087)
+#from_nodexy <- c(9.154614,47.683042)
+to_nodexy <- c(9.159216,47.679538)
+
 # set weight name to choose based on which weight shortest path should be calculated
 weight_nameex <- "length_weighted_exp" # exp() of accident count per street
   # for this we need "influence_factor_accidents" --> value between 1-100 (percent), how much should safety count
@@ -76,20 +82,28 @@ shortest_pathm <- get_shortest_path(from_nodexy,to_nodexy, graph, nodes, edges, 
 
 fromto_df <- fromto_xy_tosf(from_nodexy, to_nodexy)
 
+box = c(xmin = 13.422, ymin = 52.511, xmax = 13.48, ymax = 52.521)
+edges_small <- st_crop(edges, box)
+nodes_small <- st_crop(nodes, box)
+  
+
 # plot all available streets in graph & start and stop points I want to connect
 ggplot() +
-  geom_sf(data = graph %>% activate(edges) %>% as_tibble() %>% st_as_sf(), aes(geometry = geometry), col = 'darkgrey') +
+  geom_sf(data = edges_small, aes(geometry = geometry), col = 'darkgrey') +
+  geom_sf(data = nodes_small, aes(geometry = geometry), col = 'red') +
+  #geom_sf(data = graph %>% activate(edges) %>% as_tibble() %>% st_as_sf(), aes(geometry = geometry), col = 'darkgrey') +
   #geom_sf(data = graph %>% activate(nodes) %>% as_tibble() %>% st_as_sf(), aes(geometry = geometry), col = 'orange') +
   # geom_sf(data = nodes[,"nodeID" == 13246], aes(geometry = geometry),col = 'red')  + # this is the node that is closest to our input point
   # geom_sf(data = nodes[,"nodeID" == 10502], aes(geometry = geometry),col = 'red')  
-  geom_sf(data = fromto_df, aes(geometry = geometry),col = 'red')  
+  geom_sf(data = fromto_df, aes(geometry = geometry),col = 'blue', size = 2)  
+
 
 # plot streets/edges in graph & all shortest_path variants
 ggplot() +
   geom_sf(data = graph %>% activate(edges) %>% as_tibble() %>% st_as_sf(), col = 'darkgrey') +
   #geom_sf(data = graph %>% activate(nodes) %>% as_tibble() %>% st_as_sf(), col = 'red', size = 0.5) #+
-  geom_sf(data = shortest_pathex %>% activate(edges) %>% as_tibble() %>% st_as_sf(), lwd = 2, col = 'blue') +
-  geom_sf(data = shortest_pathm %>% activate(edges) %>% as_tibble() %>% st_as_sf(), lwd = 2, col = 'green') +
+  # geom_sf(data = shortest_pathex %>% activate(edges) %>% as_tibble() %>% st_as_sf(), lwd = 2, col = 'blue') +
+  # geom_sf(data = shortest_pathm %>% activate(edges) %>% as_tibble() %>% st_as_sf(), lwd = 2, col = 'green') +
   geom_sf(data = shortest_path %>% activate(edges) %>% as_tibble() %>% st_as_sf(), lwd = 2, col = 'red')  +
   geom_sf(data = fromto_df, aes(geometry = geometry),col = 'blue') 
 
@@ -127,7 +141,7 @@ ggplot() +
 # Why exp()?
 perc_df <- data.frame("percent" = seq(0,1,0.01))
 ggplot(perc_df) +
-  geom_point(aes(x=percent, y= exp(percent)), color = "red") +
+  geom_point(aes(x=percent, y= exp(percent)), color = "red") #+
   geom_point(aes(x=percent, y= exp(percent*4)), color = "orange") +
   geom_point(aes(x=percent, y= exp(percent*5)), color = "yellow") +
   geom_point(aes(x=percent, y= exp(percent*6)), color = "blue") 

@@ -148,7 +148,7 @@ create_edges_nodes <- function(road_data, influence_factor_accidents, add_meters
            ),
       length_edge = st_length(geometry),
       length_weighted_exp = exp(influence_factor_accidents) * length_edge,
-      length_weighted_m =  (accidents_count_weighted * add_meters) * length_edge,
+      length_weighted_m =  (accidents_count_weighted * add_meters) + length_edge,
       #length_weighted_m = replace(length_weighted_m, length_weighted_m == zero_meters, length_edge)
       length_weighted_m = case_when(
         length_weighted_m == zero_meters ~ length_edge,
