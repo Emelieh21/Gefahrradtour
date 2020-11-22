@@ -1,0 +1,13 @@
+name: Gefahrradtour
+title: Gefahrradtour
+username:
+account: emelieh21
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3284297
+bundleId: 3892349
+url: https://emelieh21.shinyapps.io/Gefahrradtour/
+when: 1606084220.59144
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: README.md|assets/.DS_Store|assets/image.png|assets/logo-name.png|assets/logo.jpeg|data/.DS_Store|data/.Rhistory|www/.DS_Store|scripts|temp

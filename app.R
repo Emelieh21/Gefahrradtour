@@ -4,6 +4,7 @@
 library(leaflet)
 library(shiny)
 library(jsonlite)
+library(curl)
 
 # 1) Read in accident data ####
 accidents <- read.csv2("data/AfSBBB_BE_LOR_Strasse_Strassenverkehrsunfaelle_2019_Datensatz.csv", stringsAsFactors = FALSE)
@@ -54,7 +55,11 @@ ui <- fluidPage(theme = "bootstrap-sketchy.css",
                          border-width: 5px; border-color: #ff675b; background-color: white;",
                 # This explodes when trying to plot all in one shot, that's why I don't add multiple select for now...
                 textInput("point_a", label = "From", value = "Invalidenstraße 117, Berlin", width = 210),
+                # Temporarily show coordinates for Jasmin for debugging
+                div(style="width:210px;", verbatimTextOutput("warning_a")),
                 textInput("point_b", label = "To", value = "...", width = 210),
+                # Temporarily show coordinates for Jasmin for debugging
+                div(style="width:210px;", verbatimTextOutput("warning_b")),
                 actionButton("go", "Go", style = "background-color: #ff675b; font-size: 16px; font-weight:700; color: white;")
   )
 )
@@ -102,13 +107,32 @@ server <- function(input, output, session) {
   # 2) Put selection on a map ####
   # ============================ #
   observeEvent(input$go, {
-    # 2a) Get coordinates from point A address ####
-    url <- paste0("https://geocode.search.hereapi.com/v1/geocode?q=",URLencode(input$point_a),"&apiKey=",token)
-    values$result_a <- fromJSON(url)
-    
-    # 2b) Get coordinates from point A address ####
-    url <- paste0("https://geocode.search.hereapi.com/v1/geocode?q=",URLencode(input$point_b),"&apiKey=",token)
-    values$result_b <- fromJSON(url)
+      # 2a) Get coordinates from point A address ####
+      url <- paste0("https://geocode.search.hereapi.com/v1/geocode?q=",URLencode(input$point_a),"&apiKey=",token)
+      result_a <- fromJSON(url)
+      values$result_a <- result_a
+      
+      # 2b) Get coordinates from point A address ####
+      url <- paste0("https://geocode.search.hereapi.com/v1/geocode?q=",URLencode(input$point_b),"&apiKey=",token)
+      result_b <- fromJSON(url)
+      values$result_b <- result_b
+      
+      # Add bounding box to display search area ####
+      if (!is.null(result_a$items$position) & !is.null(result_b$items$position)) {
+        xmin <- min(result_a$items$position$lng, result_b$items$position$lng)-0.005
+        xmax <- max(result_a$items$position$lng, result_b$items$position$lng)+0.005
+        ymin <- min(result_a$items$position$lat, result_b$items$position$lat)-0.005
+        ymax <- max(result_a$items$position$lat, result_b$items$position$lat)+0.005
+        
+        leafletProxy("map", session = session) %>% 
+          clearGroup(group = "box") %>%
+          addRectangles(group = "box",
+            lng1=xmax, lat1=ymax,
+            lng2=xmin, lat2=ymin,
+            color = "#ff675b",
+            fillColor = "transparent"
+          ) 
+      }
   })
   
   # 2c) React to the change in location A/B ####
@@ -120,16 +144,23 @@ server <- function(input, output, session) {
     
     # 2e) Put the new position on the map ####
     result_a <- values$result_a
+    print(result_a$items$position) # TEST ####
     result_b <- values$result_b
+    print(result_b$items$position) # TEST ####
+    # Temporily showing coordinates for debugging
+    output$warning_a <- renderText(paste0(result_a$items$position$lat,", ",
+                                        result_a$items$position$lng))
+    output$warning_b <- renderText(paste0(result_b$items$position$lat,", ",
+                                        result_b$items$position$lng))
     
-    if (!is.null(result_a)) {
+    if (!is.null(result_a$items$position)) {
       leafletProxy("map", session = session) %>%
         addCircleMarkers(group = "routePoints", lng = result_a$items$position$lng, lat = result_a$items$position$lat,
                          popup = "You are here", fillColor = "#ff675b", color = "#4d4d4d",
                          weight = 3, fillOpacity = 1, opacity = 1)
     }
     
-    if (!is.null(result_b)) {
+    if (!is.null(result_b$items$position)) {
       leafletProxy("map", session = session) %>% 
         addCircleMarkers(group = "routePoints", lng = result_b$items$position$lng, lat = result_b$items$position$lat,
                          popup = "You are thinking about going here", fillColor = "#fdfd00", color = "#4d4d4d",
