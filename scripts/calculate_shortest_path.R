@@ -10,6 +10,7 @@ library(geojsonR)
 library(osmdata)
 library(igraph)
 library(tidygraph)
+library(units)
 # Note: This code is based on this tutorial: https://www.r-spatial.org/r/2019/09/26/spatial-networks.html
 
 ## this script uses the functions from 'routing.R' to calculate the shortest path between two input nodes
