@@ -9,10 +9,13 @@
 
 fromto_xy_tosf <- function(from_node, to_node) {
   
-  df <- data.frame("nodeID" = c(99999999, 99999998), "lon" = c(from_node[1],to_node[1]), "lat" = c(from_node[2],to_node[2]))
+  df <- data.frame("nodeID" = c(99999999, 99999998), 
+                   "lon" = c(from_node[1],to_node[1]), "lat" = c(from_node[2],to_node[2]))
   df_sf <- df
   coordinates(df_sf) <- c("lon", "lat")
   df_sf <- st_as_sf(df_sf, coords = c("lon", "lat"))
+  df_sf$lon <- c(from_node[1], to_node[1])
+  df_sf$lat <- c(from_node[2], to_node[2])
   
   fromto_df <- df_sf %>%  st_set_crs(st_crs(nodes))
   
@@ -148,6 +151,9 @@ create_edges_nodes <- function(road_data, influence_factor_accidents, add_meters
            ),
       length_edge = st_length(geometry),
       length_weighted_exp = exp(influence_factor_accidents) * length_edge,
+      length_weighted_exp4 = exp(influence_factor_accidents*4) * length_edge,
+      length_weighted_exp5 = exp(influence_factor_accidents*5) * length_edge,
+      length_weighted_exp6 = exp(influence_factor_accidents*6) * length_edge,
       length_weighted_m =  (accidents_count_weighted * set_units(add_meters, "meters")) + length_edge,
       #length_weighted_m = replace(length_weighted_m, length_weighted_m == zero_meters, length_edge)
       length_weighted_m = case_when(
@@ -207,6 +213,7 @@ get_shortest_path <- function(from_node, to_node, graph, nodes, edges, weight_na
       activate(edges) %>% 
       mutate(length = !!as.name(weight_name))
     
+
     path <- shortest_paths(
       graph = graph,
       from = nearest[1],
@@ -237,5 +244,6 @@ get_shortest_path <- function(from_node, to_node, graph, nodes, edges, weight_na
       as_tbl_graph()
     
     return(shortest_path_graph)
-  }
+}
+
   
