@@ -5,6 +5,20 @@ library(leaflet)
 library(shiny)
 library(jsonlite)
 library(curl)
+# Jasmin's packages...
+library(tidyverse)
+library(lubridate)
+library(leaflet)
+library(ggplot2)
+library(sf)
+library(sp)
+library(tmap)    # for static and interactive maps
+library(stplanr)
+library(geojsonR)
+library(osmdata)
+library(igraph)
+library(tidygraph)
+library(units)
 
 # 1) Read in accident data ####
 accidents <- read.csv2("data/AfSBBB_BE_LOR_Strasse_Strassenverkehrsunfaelle_2019_Datensatz.csv", stringsAsFactors = FALSE)
@@ -20,7 +34,26 @@ pal <- colorNumeric(
   palette = "YlOrRd",
   domain = accidents$UKATEGORIE)
 
-# 4) Initialize reactiveValues ####
+# 4a) Read in roads as sp ####
+roads <- rgdal::readOGR("data/berlin-navigableroads-v89-1_3XjFApUX.geojson")
+
+# 4b) Convert to sf ####
+road_data <- st_as_sf(roads)
+
+# 4c) set factor for accidents (can be slider input ranging from 0-1) or can be meters that are added to edge length for each accident ####
+influence_factor_accidents <- 0.9
+add_meters <- 1000
+
+# 4d) Create graph from edges & nodes sf-table ####
+edges_nodes_list <- create_edges_nodes(road_data, influence_factor_accidents, add_meters)
+edges <- edges_nodes_list[[1]]
+nodes <- edges_nodes_list[[2]]
+graph <- create_graph(edges, nodes)
+
+# 5) This script uses the functions from 'routing.R' to calculate the shortest path between two input nodes ####
+source("scripts/routing.R")
+
+# 6) Initialize reactiveValues ####
 values <- reactiveValues(result_a = result)
 
 # ================= #
@@ -117,22 +150,38 @@ server <- function(input, output, session) {
       result_b <- fromJSON(url)
       values$result_b <- result_b
       
-      # Add bounding box to display search area ####
-      if (!is.null(result_a$items$position) & !is.null(result_b$items$position)) {
-        xmin <- min(result_a$items$position$lng, result_b$items$position$lng)-0.005
-        xmax <- max(result_a$items$position$lng, result_b$items$position$lng)+0.005
-        ymin <- min(result_a$items$position$lat, result_b$items$position$lat)-0.005
-        ymax <- max(result_a$items$position$lat, result_b$items$position$lat)+0.005
-        
-        leafletProxy("map", session = session) %>% 
-          clearGroup(group = "box") %>%
-          addRectangles(group = "box",
-            lng1=xmax, lat1=ymax,
-            lng2=xmin, lat2=ymin,
-            color = "#ff675b",
-            fillColor = "transparent"
-          ) 
-      }
+      # # Add bounding box to display search area ####
+      # if (!is.null(result_a$items$position) & !is.null(result_b$items$position)) {
+      #   xmin <- min(result_a$items$position$lng, result_b$items$position$lng)-0.005
+      #   xmax <- max(result_a$items$position$lng, result_b$items$position$lng)+0.005
+      #   ymin <- min(result_a$items$position$lat, result_b$items$position$lat)-0.005
+      #   ymax <- max(result_a$items$position$lat, result_b$items$position$lat)+0.005
+      #   
+      #   leafletProxy("map", session = session) %>% 
+      #     clearGroup(group = "box") %>%
+      #     addRectangles(group = "box",
+      #       lng1=xmax, lat1=ymax,
+      #       lng2=xmin, lat2=ymin,
+      #       color = "#ff675b",
+      #       fillColor = "transparent"
+      #     ) 
+      # }
+      
+      # Set weight name to choose based on which weight shortest path should be calculated
+      weight_name <- "length_weighted_exp" # exp() of accident count per street
+      
+      from_nodexy <- c(result_a$items$position$lng,result_a$items$position$lat)
+      to_nodexy <- c(result_b$items$position$lng,result_b$items$position$lat)
+      
+      # Outputs tidygraph of all edges as list of nodeID pairs
+      shortest_path <- get_shortest_path(from_nodexy,to_nodexy, graph, nodes, edges, weight_name)
+      
+      shortest_path <- shortest_path %>% activate(edges) %>% as.data.frame()
+      names(shortest_path$geometry) = NULL
+      
+      leafletProxy("map", session = session) %>% 
+        clearGroup(group = "path") %>%
+        addPolylines(data = shortest_path$geometry, color = "#ff675b")
   })
   
   # 2c) React to the change in location A/B ####
