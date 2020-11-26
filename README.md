@@ -17,7 +17,7 @@ rsconnect::setAccountInfo(name='<YOUR USERNAME>',
 ```
 After you run this in Rstudio, a tiny icon should show up next to the "Run App" button (when you have your shiny app script opened). Here you can select **Publish Application**. 
 
-The demo app can be found here: [https://emelieh21.shinyapps.io/danger-ranger-demo/](https://emelieh21.shinyapps.io/danger-ranger-demo/).
+The demo app can be found here: [https://emelieh21.shinyapps.io/Gefahrradtour/](https://emelieh21.shinyapps.io/Gefahrradtour/).
 
 <p align="right">
 	<img src="assets/logo.jpeg" alt="drawing" width="120"/>
