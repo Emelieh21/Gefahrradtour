@@ -36,7 +36,7 @@ pal <- colorNumeric(
   domain = accidents$UKATEGORIE)
 
 # 4) Read in routing functions ####
-source("scripts/routing-app.R")
+source("scripts/routing.R")
 
 # 5) Berlin roads: create graph from edges & nodes sf-table ####
 edges <- readRDS("data/edges.rds")
@@ -110,16 +110,15 @@ ui <- fluidPage(theme = "bootstrap-sketchy.css",
                 style = "opacity: 0.85; z-index: 1000; font-size:16px; width:260px; padding-left:16px; 
                          padding-top:16px; padding-bottom:16px; border-radius: 10px; border-style: solid; 
                          border-width: 5px; border-color: #ff675b; background-color: white;",
-                
                 # 3a) Point A select ####
                 textInput("point_a", label = "From", value = "Invalidenstraße 117, Berlin", width = 210),
-                # Show warning for invalid address
-                div(style="width:210px;", uiOutput("warning_a")),
+                # # Temporarily show coordinates for Jasmin for debugging
+                # div(style="width:210px;", verbatimTextOutput("warning_a")),
                 
                 # 3b) Point B select ####
                 textInput("point_b", label = "To", value = "...", width = 210),
-                # Show warning for invalid address
-                div(style="width:210px;", uiOutput("warning_b")),
+                # # Temporarily show coordinates for Jasmin for debugging
+                # div(style="width:210px;", verbatimTextOutput("warning_b")),
                 
                 # 3c) How dangerous do you want it slider ####
                 div(style="margin-top:15px;",
@@ -132,6 +131,10 @@ ui <- fluidPage(theme = "bootstrap-sketchy.css",
                 
                 # 3d) LET'S GO! ####
                 actionButton("go", "Go", style = "background-color: #ff675b; font-size: 16px; font-weight:700; color: white;")
+                # fluidRow(
+                #   column(2, actionButton("go", "Go", style = "background-color: #ff675b; font-size: 16px; font-weight:700; color: white;")),
+                #   column(3, actionButton("clear", "Clear routes", style = "background-color: #7d7d7d; font-size: 16px; font-weight:700; color: white;"))
+                # ) # end of fluidRow
   )
 )
 
@@ -193,42 +196,13 @@ server <- function(input, output, session) {
       result_b <- fromJSON(url)
       values$result_b <- result_b
       
-      # 2b1) Check if point_a is valid ####
-      if (!length(result_a$items$position) > 0) {
-        valid_a = FALSE
-        output$warning_a <- renderText(HTML("<em style='color: #ba4a41;'>You location is invalid.</em>"))
-      } else {
-        # Check if it is within our tiny available area
-        if (length(st_intersection(st_point(c(result_a$items$position$lng,result_a$items$position$lat)),s2.pol)) < 1) {
-          valid_a = FALSE
-          output$warning_a <- renderText(HTML("<em style='color: #ba4a41;'>You location is outside the searchable area.</em>"))
-        } else {
-          valid_a = TRUE
-          output$warning_a <- renderUI({return(NULL)})
-        }
-      }
-      
-      # 2b2) Check if point_b is valid ####
-      if (!length(result_b$items$position) > 0) {
-        valid_b = FALSE
-        output$warning_b <- renderUI(HTML("<em style='color: #ba4a41;'>You location is invalid.</em>"))
-      } else {
-        # Check if it is within our tiny available area
-        if (length(st_intersection(st_point(c(result_b$items$position$lng,result_b$items$position$lat)),s2.pol)) < 1) {
-          valid_b = FALSE
-          output$warning_b <- renderUI(HTML("<em style='color: #ba4a41;'>You location is outside the searchable area.</em>"))
-        } else {
-          valid_b = TRUE
-          output$warning_b <- renderUI({return(NULL)})
-        }
-      }
-      shiny::validate(need(valid_a & valid_b, "Invalid position in input"))
-
       # Set weight name to choose based on which weight shortest path should be calculated
       if (input$danger_range == "Very dangerous route") {
         weight_name <- "length_edge" 
+        lineColor = "#ff675b"
       } else {
         weight_name <- "length_weighted_m" 
+        lineColor = "#fdfd00"
       }
       
       from_nodexy <- c(result_a$items$position$lng,result_a$items$position$lat)
@@ -236,6 +210,7 @@ server <- function(input, output, session) {
       
       # Outputs tidygraph of all edges as list of nodeID pairs
       shortest_path <- get_shortest_path(from_nodexy,to_nodexy, graph, nodes, edges, weight_name)
+      
       shortest_path <- shortest_path %>% activate(edges) %>% as.data.frame()
       names(shortest_path$geometry) = NULL
       
@@ -252,12 +227,12 @@ server <- function(input, output, session) {
       
       leafletProxy("map", session = session) %>% 
         setView(lat = zoom_lat, lng = zoom_lng, zoom = 13) %>% 
-        clearGroup(group = "path") %>%
         hideGroup("routePoints") %>%
         addPolylines(group = "path", data = shortest_path$geometry, 
+                     #color = lineColor, 
                      color = pal(shortest_path$accidents_count_weighted),
                      opacity = 0.9,
-                     # popupOptions = popupOptions(autoClose = FALSE, closeOnClick = FALSE),
+                     popupOptions = popupOptions(autoClose = FALSE, closeOnClick = FALSE),
                      popup = paste0("<b>Distance</b>: ",routeDistance," km</br>",
                                     "<b>Travel Time</b>: ",routeTime," min</br>",
                                     "<b>Accidents</b>: ",accidentsOnRoute, " (2019)")) %>%
@@ -277,6 +252,12 @@ server <- function(input, output, session) {
     print(result_a$items$position) 
     result_b <- values$result_b
     print(result_b$items$position)
+    
+    # # Temporily showing coordinates for debugging
+    # output$warning_a <- renderText(paste0(result_a$items$position$lat,", ",
+    #                                     result_a$items$position$lng))
+    # output$warning_b <- renderText(paste0(result_b$items$position$lat,", ",
+    #                                     result_b$items$position$lng))
     
     if (!is.null(result_a$items$position)) {
       leafletProxy("map", session = session) %>%
@@ -350,6 +331,14 @@ server <- function(input, output, session) {
     
     # 4c) Overwrite the values$result_b ####
     values$result_b <- result
+  })
+  
+  # ================== #
+  # 5) Clear shapes ####
+  # ================== #
+  observeEvent(input$point_a, {
+    leafletProxy("map",session) %>%
+      clearGroup(group = c("path"))
   })
 }
 

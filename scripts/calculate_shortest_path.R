@@ -58,7 +58,7 @@ from_nodexy <- c( 13.407660 ,52.521688)
 # from_nodexy <- c(13.391048 , 52.516999)
 # to_nodexy <- c(  13.387454 ,52.516836)
 # to_nodexy <- c( 13.381654 ,  52.509990)
- to_nodexy <- c( 13.402157 ,52.523745)
+to_nodexy <- c( 13.402157 ,52.523745)
 # to_nodexy <- c(13.394460,52.501298)
 # 
 # from_nodexy <- c( 13.390905 , 52.515808)
@@ -75,9 +75,9 @@ from_nodexy <- c( 13.407660 ,52.521688)
 
 # set weight name to choose based on which weight shortest path should be calculated
 weight_nameex <- "length_weighted_exp" # exp() of accident count per street
-  # for this we need "influence_factor_accidents" --> value between 1-100 (percent), how much should safety count
+# for this we need "influence_factor_accidents" --> value between 1-100 (percent), how much should safety count
 weight_namem <- "length_weighted_m" # add additional meters to street length for each accident
-  # for these we need "add_meters"
+# for these we need "add_meters"
 weight_name <- "length_edge" # normal length of a street
 
 # from_node <- from_nodexy
@@ -102,7 +102,7 @@ box = c(xmin = min(fromto_df$lon)-0.03,
         ymax = max(fromto_df$lat)+0.03)
 edges_small <- st_crop(edges, box)
 nodes_small <- st_crop(nodes, box)
-  
+
 # plot streets/edges in graph & all shortest_path variants
 ggplot() +
   # geom_sf(data = graph %>% activate(edges) %>% as_tibble() %>% st_as_sf(), col = 'darkgrey') +
@@ -131,8 +131,8 @@ ggplot() +
   geom_sf(data = graph %>% activate(edges) %>% as_tibble() %>% st_as_sf(), col = 'darkgrey') +
   geom_sf(data = graph %>% activate(nodes) %>% as_tibble() %>% st_as_sf(), col = 'red', size = 0.5) +
   geom_sf(data = shortest_path %>% activate(edges) %>% as_tibble() %>% st_as_sf(), lwd = 2, col = 'blue') #+
-  #geom_sf(data = shortest_path %>% activate(nodes) %>% filter(nodeID %in% c(from_node, to_node)) %>% as_tibble() %>% st_as_sf(), size = 2)  +
-  #geom_sf(data = fromto_df, color = 'red', size = 4)
+#geom_sf(data = shortest_path %>% activate(nodes) %>% filter(nodeID %in% c(from_node, to_node)) %>% as_tibble() %>% st_as_sf(), size = 2)  +
+#geom_sf(data = fromto_df, color = 'red', size = 4)
 
 
 # plot edges coloured by number of accidents
@@ -142,13 +142,13 @@ ggplot() +
   geom_sf(data = edges, aes(geometry = geometry, color = accidents_count_weighted), show.legend = "line") +
   scale_color_continuous(low = "#ffa500",high = "#005f6a")
 
-  
+
 # plot edges coloured by accident "yes" or "no"
 ggplot() +
   geom_sf(data = edges, aes(geometry = geometry, color = factor(accident_happened)), show.legend = "line") +
   scale_color_manual(values= c("#005f6a","#ffa500"))
 
-  
+
 
 
 # explanation influence factor of safety on shortest route ------------------------
@@ -160,7 +160,7 @@ ggplot() +
 perc_df <- data.frame("percent" = seq(0,1,0.01))
 ggplot(perc_df) +
   geom_point(aes(x=percent, y= exp(percent)), color = "red") #+
-  geom_point(aes(x=percent, y= exp(percent*4)), color = "orange") +
+geom_point(aes(x=percent, y= exp(percent*4)), color = "orange") +
   geom_point(aes(x=percent, y= exp(percent*5)), color = "yellow") +
   geom_point(aes(x=percent, y= exp(percent*6)), color = "blue") 
 # --> this why we have steepr increase in mulitplying factor and towards 100% safety it gets more and more important
@@ -173,4 +173,3 @@ distances <- distances(
   graph = graph,
   weights = graph %>% activate(edges) %>% pull(length_edge) # set weight of graph as edge length
 )
-
