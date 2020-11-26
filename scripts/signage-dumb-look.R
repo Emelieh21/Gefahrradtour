@@ -1,20 +1,20 @@
-install.packages("tidyverse")
-install.packages("leaflet")
-install.packages("geosphere")
 library(leaflet)
 library(tidyverse)
 library(geosphere)
-
+library(ggmap)
 
 
 setwd("C:/Users/Jordan/Documents/GitHub/Gefahrradtour/")
 
-geo_dat <- jsonlite::read_json("data/berlin-trafficsigns-v89-1_L7GSlZm6.geojson")
 signs <- rgdal::readOGR("data/berlin-trafficsigns-v89-1_L7GSlZm6.geojson")
 
 signs_df <- as.data.frame(signs)
 
 accidents <- read.csv2("data/AfSBBB_BE_LOR_Strasse_Strassenverkehrsunfaelle_2019_Datensatz.csv", stringsAsFactors = FALSE)
+
+roads <-  rgdal::readOGR("data/berlin-navigableroads-v89-1_3XjFApUX.geojson")
+
+roads_df <-as.data.frame(roads)
 
 ##Getting accidents
 accidents$dummy <- 1
@@ -76,18 +76,37 @@ signs_sum <- signs_df %>% group_by(signType) %>% summarise(sign_count = n())
 
 sum_df <- sum_df %>% left_join(signs_sum)
 
+##create BB from signs
+##bbox <- c(13.35926,52.53962),c(13.44915,52.52878),c(13.36634,52.47072),c(13.42270,52.55859)
 
-### Looks like 
+lat <- signs_df$coords.x1
+lon <- signs_df$coords.x2
+
+bbox <- ggmap::make_bbox(lat,lon,f=.05)
+##Checking if accidents not near a sign were in BBOX
+
+accidents_in_bbox <- accidents%>% 
+  mutate(lat_ok = YGCSWGS84 > bbox[2] & YGCSWGS84 < bbox[4],
+         lon_ok = XGCSWGS84 > bbox[1]& XGCSWGS84 < bbox[3] ) %>%
+  filter(lat_ok & lon_ok)
+
+accidents_no_sign <- accidents_in_bbox %>% filter(!(OBJECTID %in% df$OBJECTID))
 
 
+##Checking if accidents not near a sign were in BBOX
+accidents_in_bbox_signs <- df%>% 
+  mutate(lat_ok = YGCSWGS84 > bbox[2] & YGCSWGS84 < bbox[4],
+         lon_ok = XGCSWGS84 > bbox[1]& XGCSWGS84 < bbox[3] ) %>%
+  filter(lat_ok & lon_ok)
 
 
-leaflet(signs_df) %>%
-  addTiles() %>%
-  addMarkers(lng = ~coords.x1, lat = ~coords.x2, popup = ~paste("Bike: ",IstRad,"</br>",
-                                                                "Car: ",IstPKW,"</br>",
-                                                                "Pedestrian: ",IstFuss,"</br>",
-                                                                "Krad: ",IstKrad,"</br>",
-                                                                "Gkfz: ",IstGkfz,"</br>",
-                                                                "Other: ",IstSonstige,"</br>"),
-             clusterOptions = markerClusterOptions())
+length(unique(accidents_no_sign$OBJECTID))/length(unique(accidents_in_bbox$OBJECTID))
+
+length(unique(accidents_no_sign$OBJECTID[accidents_no_sign$IstRad == 1]))/length(unique(accidents_in_bbox))
+
+##Bike accidents in bbox
+length(unique(accidents_in_bbox$OBJECTID[accidents_in_bbox$IstRad == 1]))
+##Quick check on autos and bikes etc.
+accidents_in_bbox %>% group_by(IstRad ==1) %>% summarise(autos = sum(IstPKW),
+                                                         pedestrians = sum(IstFuss),
+                                                         trucks = sum(IstGkfz))
