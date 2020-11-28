@@ -1,10 +1,9 @@
 # Gefahrradtour
 
-Project for the HERE Map Data Hackathon 2020
+Project for the HERE Map Data Hackathon 2020.Find the safest route from A to B in Berlin thanks to HERE Data Layers and Berlin traffic accident data.
 
 ### Introduction
-
-Find the safest route from A to B in Berlin thanks to HERE Data Layers and Berlin traffic accident data.
+Road safety is an important issue in many cities. In Berlin in 2019 alone over 13.000 road accidents occured, every 3 hours a biker or pedestrian had an accident (almost 4000 accidents involved bikers or pedestrians) [1]. 34 accidents were fatal. We therefore created an app that shows you the shortest but also the safest route that helps you avoid dangerous streets and intersections to arrive safely to a destination of your choice.
 
 
 ### The data
@@ -23,7 +22,7 @@ This data set contains all accidents that occured in Berlin in 2019 [1] involvin
 
 ### How routes are computed
 To find the route between two coordinates we used the navigable roads dataset in the HERE data layers.
-Using the tidygraph library in R, the road data was preprocessed into a graph $G(V,E)$, where $V$ represents its sets of nodes and $E$ its set of edges. All road segments represent egdes and all intersections represent nodes.
+Using the tidygraph library in R, the road data was preprocessed into a graph G(V,E), where V represents its sets of nodes and E its set of edges. All road segments represent egdes and all intersections represent nodes.
 The road graph serves as input into the shortest path algorithm, for which we used the Dijkstra's algorithm [2]. This algorithm outputs the shortest path between two nodes in a graph. It takes into account the edges' weights. If the user selects the "very dangerous route" in the shinyapp, these edge weights are simply the length of each road segment. If "very safe route" is selected, we check how many accidents occured on a road segment and add 300 m to this edge's length for each accident that occured on it. We choose 300 m since this produced the most logical routes with a good balance of route safety and route length. We counted accidents with severe injuries as two accidents and those that lead to a death as three accidents.
 
 
