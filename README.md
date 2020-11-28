@@ -12,7 +12,7 @@ The Gefahrradtour App is based on two data sets:
 1. **Navigable roads from HERE Data Layers**
 The roads data set used for calculating the route between two points was provided by HERE for the hackathon in a geojson file. It contains 18916 road segments covering a section of Berlin which inlcudes most of its central districts (see Figure 1).
 
-<p style = 'margin-left:30px'>
+<p style = 'margin-left:45px'>
 	<img src="assets/berlin_boundingbox_hereroads200.JPG"/>
 </p>
 
@@ -28,7 +28,7 @@ The road graph serves as input into the shortest path algorithm, for which we us
 ### How the app works
 The app allows the user to select a starting point and a destination (either by typing the address or clicking on the map) and to choose either the fastest route (_very dangerous route_) or the safest route (_very safe route_). Once the route is generated you can see which parts of the route are more dangerous (red color indicates higher number of accidents) and how many accidents happened on that route in total (based 2019 data). 
 
-![image](assets/Screenshot 2020-11-29 at 00.02.07.png)
+![image](assets/app-screenshot.png)
 
 **The app can be visited [here](https://emelieh21.shinyapps.io/Gefahrradtour/)**. Currently, this demo version of the app is only available for the restricted area of Berlin for which we have data on navigable roads available.
 
