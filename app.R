@@ -169,7 +169,7 @@ server <- function(input, output, session) {
                        fillColor = ~pal(4-UKATEGORIE)) %>%
       hideGroup("accidents") %>% 
       # Initialize with default address
-      addCircleMarkers(group = "routePoints", lng = result$items$position$lng, lat = result$items$position$lat,
+      addCircleMarkers(group = "routePoints", lng = result$items$position$lng[1], lat = result$items$position$lat[1],
                        popup = "You are here", fillColor = "#ff675b", color = "#4d4d4d",
                        weight = 3, fillOpacity = 1, opacity = 1) %>%
       addPolygons(data = st_geometry(t)[[1]], 
@@ -199,7 +199,7 @@ server <- function(input, output, session) {
         output$warning_a <- renderText(HTML("<em style='color: #ba4a41;'>You location is invalid.</em>"))
       } else {
         # Check if it is within our tiny available area
-        if (length(st_intersection(st_point(c(result_a$items$position$lng,result_a$items$position$lat)),s2.pol)) < 1) {
+        if (length(st_intersection(st_point(c(result_a$items$position$lng[1],result_a$items$position$lat[1])),s2.pol)) < 1) {
           valid_a = FALSE
           output$warning_a <- renderText(HTML("<em style='color: #ba4a41;'>You location is outside the searchable area.</em>"))
         } else {
@@ -214,7 +214,7 @@ server <- function(input, output, session) {
         output$warning_b <- renderUI(HTML("<em style='color: #ba4a41;'>You location is invalid.</em>"))
       } else {
         # Check if it is within our tiny available area
-        if (length(st_intersection(st_point(c(result_b$items$position$lng,result_b$items$position$lat)),s2.pol)) < 1) {
+        if (length(st_intersection(st_point(c(result_b$items$position$lng[1],result_b$items$position$lat[1])),s2.pol)) < 1) {
           valid_b = FALSE
           output$warning_b <- renderUI(HTML("<em style='color: #ba4a41;'>You location is outside the searchable area.</em>"))
         } else {
@@ -231,8 +231,8 @@ server <- function(input, output, session) {
         weight_name <- "length_weighted_m" 
       }
       
-      from_nodexy <- c(result_a$items$position$lng,result_a$items$position$lat)
-      to_nodexy <- c(result_b$items$position$lng,result_b$items$position$lat)
+      from_nodexy <- c(result_a$items$position$lng[1],result_a$items$position$lat[1])
+      to_nodexy <- c(result_b$items$position$lng[1],result_b$items$position$lat[1])
       
       # Outputs tidygraph of all edges as list of nodeID pairs
       shortest_path <- get_shortest_path(from_nodexy,to_nodexy, graph, nodes, edges, weight_name)
@@ -245,8 +245,8 @@ server <- function(input, output, session) {
       routeTime = round(routeDistance * minPerKm, 0)
       accidentsOnRoute = sum(shortest_path$accidents_count)
       
-      zoom_lat <- mean(result_a$items$position$lat,result_b$items$position$lat)
-      zoom_lng <- mean(result_a$items$position$lng,result_b$items$position$lng)
+      zoom_lat <- mean(result_a$items$position$lat[1],result_b$items$position$lat[1])
+      zoom_lng <- mean(result_a$items$position$lng[1],result_b$items$position$lng[1])
       
       pal <- colorNumeric(c("#d6ff30","#fdfd00","#ff675b","#ba4a41"), shortest_path$accidents_count_weighted)
       
@@ -282,14 +282,14 @@ server <- function(input, output, session) {
     
     if (!is.null(result_a$items$position)) {
       leafletProxy("map", session = session) %>%
-        addCircleMarkers(group = "routePoints", lng = result_a$items$position$lng, lat = result_a$items$position$lat,
+        addCircleMarkers(group = "routePoints", lng = result_a$items$position$lng[1], lat = result_a$items$position$lat[1],
                          popup = "You are here", fillColor = "#ff675b", color = "#4d4d4d",
                          weight = 3, fillOpacity = 1, opacity = 1)
     }
     
     if (!is.null(result_b$items$position)) {
       leafletProxy("map", session = session) %>% 
-        addCircleMarkers(group = "routePoints", lng = result_b$items$position$lng, lat = result_b$items$position$lat,
+        addCircleMarkers(group = "routePoints", lng = result_b$items$position$lng[1], lat = result_b$items$position$lat[1],
                          popup = "You are thinking about going here", fillColor = "#fdfd00", color = "#4d4d4d",
                          weight = 3, fillOpacity = 1, opacity = 1)
     }
