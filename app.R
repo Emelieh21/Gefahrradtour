@@ -257,17 +257,19 @@ server <- function(input, output, session) {
         addPolylines(group = "path", data = shortest_path$geometry, 
                      color = pal(shortest_path$accidents_count_weighted),
                      opacity = 0.9,
-                     # popupOptions = popupOptions(autoClose = FALSE, closeOnClick = FALSE),
                      popup = paste0("<b>Distance</b>: ",routeDistance," km</br>",
                                     "<b>Travel Time</b>: ",routeTime," min</br>",
-                                    "<b>Accidents</b>: ",accidentsOnRoute, " (2019)")) %>%
+                                    "<b>Total accidents</b>: ",accidentsOnRoute," (2019)</br>",
+                                    "<b>Accidents at this point: </b>",shortest_path$accidents_count)) %>%
         # Together with hideGroup before, stupid work around to display the routePoints on top of the line...
         showGroup("routePoints")
   })
   
   # 2c) React to the change in location A/B ####
   observeEvent({values$result_a
-                values$result_b}, {
+                values$result_b
+                # See this link to explain the 1: https://stackoverflow.com/questions/34731975/how-to-listen-for-more-than-one-event-expression-within-a-shiny-eventreactive-ha
+                1}, {
     # 2d) Clear shapes ####
     proxy <- leafletProxy("map",session) %>%
       clearGroup(group = c("routePoints"))
@@ -319,7 +321,8 @@ server <- function(input, output, session) {
           color = "#1c1c1c",
           weight = 3,
           label = "Click me!",
-          popup = HTML("<button onclick='Shiny.onInputChange(\"button_click\",  Math.random())' id='add' type='button' class='btn btn-default action-button' style = 'background-color: #ff675b; font-size: 14px; font-weight:700; color: white;'>Go here</button>"))
+          popup = HTML(paste0("<button onclick='Shiny.onInputChange(\"add_origin\",  Math.random())' id='add1' type='button' class='btn btn-default action-button' style = 'background-color: #ff675b; font-size: 14px; font-weight:700; color: white; margin-bottom:5px;'>Add as origin</button></br>",
+                              "<button onclick='Shiny.onInputChange(\"add_destination\",  Math.random())' id='add2' type='button' class='btn btn-default action-button' style = 'background-color: #ff675b; font-size: 14px; font-weight:700; color: white;'>Add as destination</button>")))
     } else {
       # 3a) Set flag to FALSE
       pointVisible <<- FALSE
@@ -333,7 +336,7 @@ server <- function(input, output, session) {
   # ================================ #
   # 4) Add destination from click ####
   # ================================ #
-  observeEvent(input$button_click, {
+  observeEvent(input$add_destination, {
     message("Adding destination")
     destination <- input$map_marker_click
     
@@ -350,6 +353,28 @@ server <- function(input, output, session) {
     
     # 4c) Overwrite the values$result_b ####
     values$result_b <- result
+  })
+  
+  # ================================ #
+  # 5) Add origin from click ####
+  # ================================ #
+  observeEvent(input$add_origin, {
+    message("Adding origin")
+    origin <- input$map_marker_click
+    
+    # 5a) Update the origin address that is displayed ####
+    url = paste0("https://revgeocode.search.hereapi.com/v1/revgeocode?at=",
+                 origin$lat,"%2C",origin$lng,
+                 "&lang=en-US&apiKey=",token)
+    result <- fromJSON(url)
+    updateTextInput(session, "point_a", "From", value = result$items$address$label)
+    
+    # 5b) Clear shapes ####
+    proxy <- leafletProxy("map",session) %>%
+      clearGroup(group = c("newPoint","path"))
+    
+    # 5c) Overwrite the values$result_a ####
+    values$result_a <- result
   })
 }
 
