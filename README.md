@@ -12,7 +12,11 @@ The Gefahrradtour App is based on two data sets:
 1. **Navigable roads from HERE Data Layers**
 The roads data set used for calculating the route between two points was provided by HERE for the hackathon in a geojson file. It contains 18916 road segments covering a section of Berlin which inlcudes most of its central districts (see Figure 1).
 
-<p style = 'margin-left:45px'>
+	<img src="assets/berlin_boundingbox_hereroads200.JPG"/>
+	
+<img style="margin-left: 30px;" src="assets/berlin_boundingbox_hereroads200.JPG"/>	
+
+<p align="center">
 	<img src="assets/berlin_boundingbox_hereroads200.JPG"/>
 </p>
 
