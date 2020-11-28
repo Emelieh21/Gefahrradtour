@@ -1,8 +1,8 @@
 # Gefahrradtour
 
-Project for the HERE Map Data Hackathon 2020.Find the safest route from A to B in Berlin thanks to HERE Data Layers and Berlin traffic accident data.
+Project for the HERE Map Data Hackathon 2020. Find the safest route from A to B in Berlin thanks to HERE Data Layers and Berlin traffic accident data.
 
-### Introduction
+### How are we helping with this project?
 Road safety is an important issue in many cities. In Berlin in 2019 alone over 13.000 road accidents occured, every 3 hours a biker or pedestrian had an accident (almost 4000 accidents involved bikers or pedestrians) [1]. 34 accidents were fatal. We therefore created an app that shows you the shortest but also the safest route that helps you avoid dangerous streets and intersections to arrive safely to a destination of your choice.
 
 
@@ -43,7 +43,7 @@ The demo app can be found here: [https://emelieh21.shinyapps.io/danger-ranger-de
 	<img src="assets/logo.jpeg" alt="drawing" width="120"/>
 </p>
 
-# References
+### References
 - [1] Amt für Statistik Berlin-Brandenburg (2019). Strassenverkehrsunfälle nach Unfallort in Berlin 2019. mt für Statistik Berlin-Brandenburg (visited November 2020).
 - [2] West, D.B. (1996). Introduction to Graph Theory. Upper Saddle River, N.J.: Prentice Hall.
 
