@@ -14,11 +14,7 @@ The roads data set used for calculating the route between two points was provide
 
 	<img src="assets/berlin_boundingbox_hereroads200.JPG"/>
 	
-<img style="margin-left: 30px;" src="assets/berlin_boundingbox_hereroads200.JPG"/>	
-
-<p align="center">
-	<img src="assets/berlin_boundingbox_hereroads200.JPG"/>
-</p>
+	![image](assets/berlin_boundingbox_hereroads200.JPG)	
 
 2. **Accidents in Berlin 2019**
 This data set contains all accidents that occured in Berlin in 2019 [1] involving cars, bikers and pedestrians. For each accidents its coordinates, severity (from 1-3) and type are given. In total there where 13390 accidents recorded.
