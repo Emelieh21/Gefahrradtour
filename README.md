@@ -13,7 +13,9 @@ The Gefahrradtour App is based on two data sets:
 1. Navigable roads from HERE Data Layers
 The roads data set used for calculating the route between two points was provided by HERE for the hackathon in a geojson file. It contains 18916 road segments covering a section of Berlin which inlcudes most of its central districts (see Figure 1).
 
-![Figure 1. Area in Berlin covered by HERE navigable roads data set.](pics/berlin_boundingbox_hereroads.jps)
+![Figure 1. Area in Berlin covered by HERE navigable roads data set.](https://github.com/Emelieh21/Gefahrradtour/tree/main/assets/berlin_boundingbox_hereroads.jps)
+
+
 
 2. Accidents in Berlin 2019
 This data set contains all accidents that occured in Berlin in 2019 [1] involving cars, bikers and pedestrians. For each accidents its coordinates, severity (from 1-3) and type are given. In total there where 13390 accidents recorded.
