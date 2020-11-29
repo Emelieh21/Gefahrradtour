@@ -1,7 +1,4 @@
-<p align="right" style="margin-bottom: -5em;">
-	<img src="assets/logo.jpeg" alt="drawing" width="110"/>
-</p>
-<h1 style="margin-top: -2em;">Gefahrradtour</h1>
+# Gefahrradtour
 
 Project for the HERE Map Data Hackathon 2020. Find the safest route from A to B in Berlin thanks to HERE Data Layers and Berlin traffic accident data.
 
@@ -55,4 +52,8 @@ The demo app can be found here: [https://emelieh21.shinyapps.io/Gefahrradtour/](
 ### References
 - [1] Amt für Statistik Berlin-Brandenburg (2019). Strassenverkehrsunfälle nach Unfallort in Berlin 2019. mt für Statistik Berlin-Brandenburg (visited November 2020).
 - [2] West, D.B. (1996). Introduction to Graph Theory. Upper Saddle River, N.J.: Prentice Hall.
+
+<p align="right">
+	<img src="assets/logo.jpeg" alt="drawing" width="130"/>
+</p>
 
