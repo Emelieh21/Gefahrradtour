@@ -1,7 +1,7 @@
 <p align="right" style="margin-bottom: -5em;">
 	<img src="assets/logo.jpeg" alt="drawing" width="110"/>
 </p>
-# Gefahrradtour
+<h1>Gefahrradtour</h1>
 
 Project for the HERE Map Data Hackathon 2020. Find the safest route from A to B in Berlin thanks to HERE Data Layers and Berlin traffic accident data.
 
