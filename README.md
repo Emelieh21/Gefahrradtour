@@ -1,6 +1,6 @@
 # Gefahrradtour
 
-_Find the safest route from A to B in Berlin with HERE Data Layers and Berlin traffic accident data. A project by Jordan Skubic, Jasmin Classen and Emelie Hofland for the [HERE Map Data Hackathon 2020](https://herehackathon.devpost.com/)._
+_**Find the safest route from A to B in Berlin with HERE Data Layers and Berlin traffic accident data**. A project by Jordan Skubic, Jasmin Classen and Emelie Hofland for the [HERE Map Data Hackathon 2020](https://herehackathon.devpost.com/)._
 
 ### How are we helping with this project?
 Road safety is an important issue in many cities. In Berlin in 2019 alone over 13.000 road accidents occured, **every 2 hours a biker had an accident** (over 5.000 accidents involved bikers) [1]. 34 accidents were fatal. We therefore created an app that shows you the shortest but also the safest route that helps you avoid dangerous streets and intersections to arrive safely to a destination of your choice.
