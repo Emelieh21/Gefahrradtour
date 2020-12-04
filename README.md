@@ -1,9 +1,9 @@
 # Gefahrradtour
 
-Project for the HERE Map Data Hackathon 2020. Find the safest route from A to B in Berlin thanks to HERE Data Layers and Berlin traffic accident data.
+_Find the safest route from A to B in Berlin with HERE Data Layers and Berlin traffic accident data. A project by Jordan Skubic, Jasmin Classen and Emelie Hofland for the [HERE Map Data Hackathon 2020](https://herehackathon.devpost.com/)._
 
 ### How are we helping with this project?
-Road safety is an important issue in many cities. In Berlin in 2019 alone over 13.000 road accidents occured, **every 3 hours a biker or pedestrian had an accident** (almost 4000 accidents involved bikers or pedestrians) [1]. 34 accidents were fatal. We therefore created an app that shows you the shortest but also the safest route that helps you avoid dangerous streets and intersections to arrive safely to a destination of your choice.
+Road safety is an important issue in many cities. In Berlin in 2019 alone over 13.000 road accidents occured, **every 2 hours a biker had an accident** (over 5.000 accidents involved bikers) [1]. 34 accidents were fatal. We therefore created an app that shows you the shortest but also the safest route that helps you avoid dangerous streets and intersections to arrive safely to a destination of your choice.
 
 
 ### The data
@@ -27,10 +27,14 @@ The app allows the user to select a starting point and a destination (either by 
 
 ![image](assets/app-screenshot.png)
 
-**The app can be visited [here](https://emelieh21.shinyapps.io/Gefahrradtour/)**. Currently, this demo version of the app is only available for the restricted area of Berlin for which we have data on navigable roads available.
+The app can be visited **[here](https://emelieh21.shinyapps.io/Gefahrradtour/)**. 
+
+### Availability and potential extension of the app
+Currently, this demo version of the app is **only available for a restricted area of Berlin** for which we have data on navigable roads and accidents available. Not all cities will have such robust data on accidents, however **the HERE data layers provide some possible avenues to extend Gefahrradtour** to these cities. One such example is the information on signage. Within the area covered by the HERE signage data, we see that 70% of accidents involving bicycles occur where there is no traffic signage (within 20 meters), giving some indication that signs help to reduce to accidents. 
+
+There would need to be more rigorous analysis to contextualize this (e.g. total sign coverage and traffic volumes), but doing so in a more fleshed-out product would allow for a more flexible application to additional cities with only partial data coverage.
 
 ### Technologies used in the app
-
 The app is build with R Shiny (see the [app.R](app.R) script). For all the mapping functionality, it used the Leaflet package and the theme applied is [Bootstrap Sketchy](https://bootswatch.com/sketchy/). For the geocoding and reverse geocoding we used the [HERE Geocoding and Search API](https://developer.here.com/products/geocoding-and-search). As explained above the routes are computed using an algorithm to find the shortest path between two points using the navigable roads data set from the HERE data layers.
 
 
