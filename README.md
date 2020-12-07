@@ -35,7 +35,7 @@ Currently, this demo version of the app is **only available for a restricted are
 There would need to be more rigorous analysis to contextualize this (e.g. total sign coverage and traffic volumes), but doing so in a more fleshed-out product would allow for a more flexible application to additional cities with only partial data coverage.
 
 ### Technologies used in the app
-The app is build with R Shiny (see the [app.R](app.R) script). For all the mapping functionality, it used the Leaflet package and the theme applied is [Bootstrap Sketchy](https://bootswatch.com/sketchy/). For the geocoding and reverse geocoding we used the [HERE Geocoding and Search API](https://developer.here.com/products/geocoding-and-search). As explained above the routes are computed using an algorithm to find the shortest path between two points using the navigable roads data set from the HERE data layers.
+The app is built with R Shiny (see the [app.R](app.R) script). For all the mapping functionality, it used the Leaflet package and the theme applied is [Bootstrap Sketchy](https://bootswatch.com/sketchy/). For the geocoding and reverse geocoding we used the [HERE Geocoding and Search API](https://developer.here.com/products/geocoding-and-search). As explained above the routes are computed using an algorithm to find the shortest path between two points using the navigable roads data set from the HERE data layers.
 
 
 ### Deploying the demo app
