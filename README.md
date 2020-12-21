@@ -19,7 +19,7 @@ This data set contains all accidents that occured in Berlin in 2019 [1] involvin
 
 ### How routes are computed
 To find the route between two coordinates we used the **navigable roads dataset** in the [HERE data layers](https://developer.here.com/products/data-layers).
-Using the tidygraph library in R, the road data was preprocessed into a graph G(V,E), where V represents its sets of nodes and E its set of edges. All road segments represent egdes and all intersections represent nodes.
+Using the tidygraph library in R [3,4], the road data was preprocessed into a graph G(V,E), where V represents its sets of nodes and E its set of edges. All road segments represent egdes and all intersections represent nodes.
 The road graph serves as input into the shortest path algorithm, for which we used the **Dijkstra's algorithm** [2]. This algorithm outputs the shortest path between two nodes in a graph. It takes into account the edges' weights. If the user selects the "_very dangerous route_" in the shinyapp, these edge weights are simply the length of each road segment. If "_very safe route_" is selected, we check how many accidents occured on a road segment and add 300 m to this edge's length for each accident that occured on it. We choose 300 m since this produced the most logical routes with a good balance of route safety and route length. We counted accidents with severe injuries as two accidents and those that lead to a death as three accidents.
 
 ### How the app works
@@ -35,7 +35,7 @@ Currently, this demo version of the app is **only available for a restricted are
 There would need to be more rigorous analysis to contextualize this (e.g. total sign coverage and traffic volumes), but doing so in a more fleshed-out product would allow for a more flexible application to additional cities with only partial data coverage.
 
 ### Technologies used in the app
-The app is built with R Shiny (see the [app.R](app.R) script). For all the mapping functionality, it used the Leaflet package and the theme applied is [Bootstrap Sketchy](https://bootswatch.com/sketchy/). For the geocoding and reverse geocoding we used the [HERE Geocoding and Search API](https://developer.here.com/products/geocoding-and-search). As explained above the routes are computed using an algorithm to find the shortest path between two points using the navigable roads data set from the HERE data layers.
+The app is built with R Shiny (see the [app.R](app.R) script). For all the mapping functionality, it used the Leaflet package and the theme applied is [Bootstrap Sketchy](https://bootswatch.com/sketchy/). For the geocoding and reverse geocoding we used the [HERE Geocoding and Search API](https://developer.here.com/products/geocoding-and-search). As explained above the routes are computed using an algorithm to find the shortest path between two points using the navigable roads data set from the HERE data layers and the tidygraph R-package [3]. We found the tutorial by Van der Meer et al. very useful for getting started with tidygraph [4].
 
 
 ### Deploying the demo app
@@ -56,6 +56,8 @@ The demo app can be found here: [https://emelieh21.shinyapps.io/Gefahrradtour/](
 ### References
 - [1] Amt für Statistik Berlin-Brandenburg (2019). Strassenverkehrsunfälle nach Unfallort in Berlin 2019. mt für Statistik Berlin-Brandenburg (visited November 2020).
 - [2] West, D.B. (1996). Introduction to Graph Theory. Upper Saddle River, N.J.: Prentice Hall.
+- [3] Lin Pedersen, Thomas (2020). tidygraph: A Tidy API for Graph Manipulation (R package version 1.2.0). URL: https://CRAN.R-project.org/package=tidygraph
+- [4] Van der Meer, L., Lovelace, R. and Abad, L. (September 26th, 2019). Spatial networks in R with sf and tidygraph. URL: https://www.r-spatial.org/r/2019/09/26/spatial-networks.html. Visited: December 7th 2020. 
 
 <p align="right">
 	<img src="assets/logo.jpeg" alt="drawing" width="130"/>
